@@ -32,14 +32,21 @@ const AuthProvider = ({ children }) => {
 		setData({});
 	};
 
-	const updateProfile = async ({ user }) => {
+	const updateProfile = async ({ user, avatarFile }) => {
 		try {
-			await api.put('/users', user)
-			localStorage.setItem('@rocketnotes:user', JSON.stringify(user))
+			if (avatarFile) {
+				const fileUploadForm = new FormData();
+				fileUploadForm.append("avatar", avatarFile);
 
-			setData({ user, token: data.token })
-			alert('Perfil atualizado!')
+				const response = await api.patch("/users/avatar", fileUploadForm);
+				user.avatar = response.data.avatar;
+			}
 
+			await api.put("/users", user);
+			localStorage.setItem("@rocketnotes:user", JSON.stringify(user));
+
+			setData({ user, token: data.token });
+			alert("Perfil atualizado!");
 		} catch (error) {
 			if (error.response) {
 				alert(error.response.data.message);

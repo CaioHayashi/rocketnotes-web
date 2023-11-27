@@ -18,6 +18,11 @@ export const Container = styled.div`
 			color: ${({ theme }) => theme.COLORS.GRAY_100};
 			font-style: 24px;
 		}
+
+		> button {
+			background-color: transparent;
+			border: none;
+		}
 	}
 `;
 

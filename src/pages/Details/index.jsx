@@ -1,46 +1,80 @@
-import { Container, Links,Content } from "./styles";
+import { Container, Links, Content } from "./styles";
 
 import { Header } from "../../components/Header";
 import { Section } from "../../components/Section";
 import { ButtonText } from "../../components/ButtonText";
 import { Button } from "../../components/Button";
 import { Tag } from "../../components/Tag";
+import { useEffect, useState } from "react";
+import { api } from "../../services/api";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const Details = () => {
+	const [data, setData] = useState();
+	const params = useParams();
+
+	const navegate = useNavigate();
+
+	const handleBack = () => {
+		navegate(-1);
+	};
+
+	const handleRemoveNote = async () => {
+		const confirm = window.confirm("Deseja realmente deletar essa nota?");
+
+		if (confirm) {
+			await api.delete(`/notes/${params.id}`);
+			navegate(-1);
+		}
+	};
+
+	useEffect(() => {
+		const fetchNote = async () => {
+			const response = await api.get(`/notes/${params.id}`);
+			setData(response.data);
+		};
+
+		fetchNote();
+	}, [params.id]);
+
 	return (
 		<Container>
 			<Header />
 
-			<main>
-				<Content>
-					<ButtonText title="excluir nota" />
+			{data && (
+				<main>
+					<Content>
+						<ButtonText title="excluir nota" onClick={handleRemoveNote} />
 
-					<h1>Introdução ao React</h1>
+						<h1>{data.title}</h1>
 
-					<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolores at tempore repellat voluptatum culpa vero tenetur cum pariatur! Dolore iste rem ipsam sapiente nostrum eos repellat fugiat ab, odio officiis! Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo ipsa, consequatur itaque veniam porro voluptatibus. Vero doloremque dolores necessitatibus fugit, ratione labore dolor fugiat reprehenderit vel adipisci, nihil a odio.</p>
-					<Section title="Links Úteis">
-						<Links>
-							<li>
-								<a href="#" target="_blank">
-									https://github.com/caiohayashi
-								</a>
-							</li>
-							<li>
-								<a href="#" target="_blank">
-									https://github.com/caiohayashi
-								</a>
-							</li>
-						</Links>
-					</Section>
+						<p>{data.description}</p>
 
-					<Section title="Marcadores">
-						<Tag title="express" />
-						<Tag title="node" />
-					</Section>
+						{data.links && (
+							<Section title="Links Úteis">
+								{data.links.map((link) => (
+									<Links key={String(link.id)}>
+										<li>
+											<a href={link.url} target="_blank" rel="noreferrer">
+												{link.url}
+											</a>
+										</li>
+									</Links>
+								))}
+							</Section>
+						)}
+						{data.tags && (
+							<Section title="Marcadores">
+								{data.tags.map((tags) => (
+									<Tag key={String(tags.id)} title={tags.name} />
+								))}
+							</Section>
+						)}
 
-					<Button title="Voltar" />
-				</Content>
-			</main>
+						<Button title="Voltar" onClick={handleBack} />
+					</Content>
+				</main>
+			)}
 		</Container>
 	);
 };
