@@ -6,8 +6,8 @@ import { FiPlus, FiSearch } from "react-icons/fi";
 import { Section } from "../../components/Section";
 import { Note } from "../../components/Note";
 import { useEffect, useState } from "react";
-import { api } from "../../services/api";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../services/api";
 
 export const Home = () => {
 	const [tags, setTags] = useState([]);
